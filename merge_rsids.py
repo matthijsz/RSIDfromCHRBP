@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     if args.threads is None:
         if multiprocessing.cpu_count() > 3:
-            n_threads = multiprocessing.cpu_count()//2  if multiprocessing.cpu_count()
+            n_threads = multiprocessing.cpu_count()//2
         elif multiprocessing.cpu_count() > 1:
             n_threads = multiprocessing.cpu_count() - 1
         else:
