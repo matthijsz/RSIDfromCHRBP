@@ -63,8 +63,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
     outf = args.sumstats+'_RS' if args.out is None else args.out
 
-    n_threads = multiprocessing.cpu_count()-1 if args.threads is None else int(args.threads)
-    if n_threads > (multiprocessing.cpu_count()-1):
+    if args.threads is None:
+        if multiprocessing.cpu_count() > 3:
+            n_threads = multiprocessing.cpu_count()//2  if multiprocessing.cpu_count()
+        elif multiprocessing.cpu_count() > 1:
+            n_threads = multiprocessing.cpu_count() - 1
+        else:
+            n_threads = multiprocessing.cpu_count()
+    else:
+        n_threads = int(args.threads)
+    if (n_threads > (multiprocessing.cpu_count()-1)) and (multiprocessing.cpu_count() > 1):
         raise ValueError("Number of detected threads ({}) minus 1 is smaller than number of requested threads ({})".format(multiprocessing.cpu_count(), n_threads))
     start_t = time.time()
     lp = asyncio.get_event_loop()
