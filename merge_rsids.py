@@ -15,11 +15,16 @@ def merge_rs(chr_n, chunk, dat,  bpcol, trgt, reff):
     with zipfile.ZipFile(reff, 'r', compression=zipfile.ZIP_STORED) as zf:
         with zf.open('{}/{}'.format(chr_n, chunk), 'r') as f:
             rs = pickle.loads(f.read())
+    dat = dat.reset_index()
     dat[trgt] = dat[bpcol].map(rs)
     del rs
-    nnasnps = np.where(~dat[trgt].isna())[0]
-    trgtn = [n for n, i in enumerate(dat.columns) if i == trgt][0]
+    nasnp_series = dat[trgt].isna()
+    nnasnps = np.where(~nasnp_series)[0]
+    nasnps = np.where(nasnp_series)[0]
+    trgtn =[n for n, i in enumerate(dat.columns) if i == trgt][0]
+    bpn = [n for n, i in enumerate(dat.columns) if i == bpcol][0]
     dat.iloc[nnasnps, trgtn] = 'rs' + dat.iloc[nnasnps, trgtn].astype(np.int64).map(str)
+    dat.iloc[nasnps, trgtn] = str(chr_n) + ':' + dat.iloc[nasnps, bpn].map(str)
     return dat
 
 
